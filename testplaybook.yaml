@@ -1,0 +1,64 @@
+---
+- name: This Job for exam "{{ owner }}"
+  hosts: all
+  become: True
+
+  vars:
+    source_path: /home/dima/ansible/website
+    dest_path  : /var/www/html
+    owner      : MDV-devops
+
+  tasks:
+  - block: #========This block for RedHat===========
+      - name: Install Web Server on RedHat
+        yum:
+          name : httpd
+          state: present
+      - name: Start & enable Apache
+        service:
+          name : httpd
+          state: started
+          enabled: True
+    when: ansible_os_family=="RedHat"
+
+  - block: #=========This block for Debian=========
+      - name: Install Web Server on Debian
+        apt:
+          name : apache2
+          state: present
+      - name: Start & enable Apache
+        service:
+          name : apache2
+          state: started
+          enabled: True
+    when: ansible_os_family=="Debian"
+
+  - name: Generate & uploading INDEX FILE
+    template:
+      src : "{{ source_path }}/index.j2"
+      dest: "{{ dest_path }}/index.html"
+
+  - name: Uploading multiple files to Web Server
+    copy:
+      src : "{{ item }}"
+      dest: "{{ dest_path }}"
+    with_fileglob: "{{ source_path }}/*.png"
+
+  - name: Updating data on web page
+    shell: curl http://169.254.169.254/latest/meta-data/public-ipv4 >> /var/www/html/index.html
+    notify:
+      - Restarting Web Server on RedHat
+      - Restarting Web Server on Debian
+
+  handlers:
+  -  name: Restarting Web Server on RedHat
+     service:
+        name : httpd
+        state: restarted
+     when: ansible_os_family=="RedHat"
+
+  -  name:  Restarting Web Server on Debian
+     service:
+        name : apache2
+        state: restarted
+     when: ansible_os_family=="Debian"
