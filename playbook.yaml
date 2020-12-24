@@ -1,0 +1,36 @@
+---
+- name: My first web project by Ansible
+  become: yes
+  hosts: VIRGINIA_REGION
+
+  vars:
+    src_path: ./index.html
+    dest_path: /var/www/html
+
+  tasks:
+  - name: Check and print LINUX OS-version
+    debug:
+      var: ansible_os_family
+  - name: Installing web server on RedHat
+    yum:
+      name: httpd
+      state: latest
+
+  - name: Copy index file on web server
+    copy:
+      src: "{{ src_path }}"
+      dest: "{{ dest_path }}"
+      mode: 0444
+    notify: Restart Web Server
+
+  - name: Starting Apache and enable it on the boot
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+
+  handlers:
+  - name: Restart Web Server
+    service:
+      name: httpd
+      state: restarted
