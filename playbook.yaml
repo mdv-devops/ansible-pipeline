@@ -3,14 +3,7 @@
   become: yes
   hosts: all
 
-  vars:
-    src_path: ./index.html
-    dest_path: /var/www/html
-
   tasks:
-  - name: Check and print LINUX OS-version
-    debug:
-      var: ansible_os_family
   - name: Installing web server on RedHat
     yum:
       name: httpd
@@ -18,8 +11,8 @@
 
   - name: Copy index file on web server
     copy:
-      src: "{{ src_path }}"
-      dest: "{{ dest_path }}"
+      src: index.html
+      dest: /var/www/html/
       mode: 0444
     notify: Restart Web Server
 
