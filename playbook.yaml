@@ -1,7 +1,7 @@
 ---
 - name: My first web project by Ansible
   become: yes
-  hosts: VIRGINIA_REGION
+  hosts: all
 
   vars:
     src_path: ./index.html
