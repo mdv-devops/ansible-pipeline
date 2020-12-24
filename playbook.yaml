@@ -1,7 +1,7 @@
 ---
 - name: My first web project by Ansible
   become: yes
-  hosts: WEB
+  hosts: all
 
   tasks:
   - name: Installing web server on RedHat
