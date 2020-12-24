@@ -4,7 +4,7 @@
   become: True
 
   vars:
-    source_path: /home/dima/ansible/website
+    source_path: ./website
     dest_path  : /var/www/html
     owner      : MDV-devops
 
