@@ -14,8 +14,7 @@
       src: index.html
       dest: /var/www/html/
       mode: 0444
-    notify: Restart Web Server
-
+   
   - name: Starting Apache and enable it on the boot
     service:
       name: httpd
