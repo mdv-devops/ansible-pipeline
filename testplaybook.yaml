@@ -10,8 +10,29 @@
 
   tasks:
   - block: #========This block for RedHat===========
+      - name: Add repository AppStream
+        yum_repository:
+          name: AppStream
+          description: AppStream repo
+          baseurl: https://mirror.hostart.az/CentOS/8.5.2111/AppStream/x86_64/os/
+          enabled: true
+          gpgcheck: no
+      - name: Add repository Extras
+        yum_repository:
+          name: Extras
+          description: Extras repo
+          baseurl: https://mirror.hostart.az/CentOS/8.5.2111/extras/x86_64/os/
+          enabled: true
+          gpgcheck: no
+      - name: Add repository Baseos
+        yum_repository:
+          name: BaseOs
+          description: BaseOs repo
+          baseurl: https://mirror.hostart.az/CentOS/8.5.2111/BaseOS/x86_64/os/
+          enabled: true
+          gpgcheck: no
       - name: Install Web Server on RedHat
-        yum:
+        dnf:
           name : httpd
           state: present
       - name: Start & enable Apache
@@ -19,11 +40,19 @@
           name : httpd
           state: started
           enabled: True
+      - name: Create firewall rule for apache service
+        firewalld:
+          service: http
+          zone: public
+          permanent: yes
+          immediate: yes
+          state: enabled
     when: ansible_os_family=="RedHat"
 
   - block: #=========This block for Debian=========
       - name: Install Web Server on Debian
         apt:
+          update_cache: yes
           name : apache2
           state: present
       - name: Start & enable Apache
@@ -44,11 +73,11 @@
       dest: "{{ dest_path }}"
     with_fileglob: "{{ source_path }}/*.png"
 
-  - name: Updating data on web page
-    shell: curl http://169.254.169.254/latest/meta-data/public-ipv4 >> /var/www/html/index.html
-    notify:
-      - Restarting Web Server on RedHat
-      - Restarting Web Server on Debian
+#  - name: Updating data on web page
+#    shell: hostname -I | awk '{print $2}' >> /var/www/html/index.html
+#    notify:
+#      - Restarting Web Server on RedHat
+#      - Restarting Web Server on Debian
 
   handlers:
   -  name: Restarting Web Server on RedHat
